@@ -1,0 +1,71 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: forecast-api
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  labels:
+    app: forecast-api
+    app.kubernetes.io/component: forecast-api
+    app.kubernetes.io/instance: forecast-api
+spec:
+  replicas: 1
+  selector:
+    deploymentconfig: forecast-api
+  strategy:
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        deploymentconfig: forecast-api
+    spec:
+      containers:
+      - env:
+        - name: QUARKUS_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: QUARKUS_DATASOURCE_PASSWORD
+              name: forecast-api-properties
+        - name: QUARKUS_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              key: QUARKUS_DATASOURCE_URL
+              name: forecast-api-properties
+        - name: QUARKUS_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: QUARKUS_DATASOURCE_USERNAME
+              name: forecast-api-properties
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health/live
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: forecast-api
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health/ready
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - forecast-api
+      from:
+        kind: ImageStreamTag
+        name: forecast-api:latest
+    type: ImageChange

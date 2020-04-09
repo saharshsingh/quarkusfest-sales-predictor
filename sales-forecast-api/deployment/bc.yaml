@@ -1,0 +1,22 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: forecast-api
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  labels:
+    app: forecast-api
+    app.kubernetes.io/component: forecast-api
+    app.kubernetes.io/instance: forecast-api
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: forecast-api:latest
+  source:
+    contextDir: sales-forecast-api
+    git:
+      uri: https://github.com/saharshsingh/quarkusfest-sales-predictor
+    type: Git
+  strategy:
+    type: Docker

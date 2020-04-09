@@ -1,0 +1,17 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: forecast-api
+  annotations:
+    openshift.io/host.generated: "true"
+  labels:
+    app: forecast-api
+    app.kubernetes.io/component: forecast-api
+    app.kubernetes.io/instance: forecast-api
+spec:
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: forecast-api
+    weight: 100
